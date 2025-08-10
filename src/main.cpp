@@ -7,11 +7,18 @@
 #include "TouchDrvCSTXXX.hpp"
 #include <HardwareSerial.h>
 
+// Оголошення UI об'єктів
+extern lv_obj_t *ui_textarea1;
+
 TFT_eSPI tft = TFT_eSPI();
 TouchDrvCSTXXX touch;
 HardwareSerial Uart(1);
 static lv_disp_draw_buf_t lv_draw_buf;
-static lv_color_t lv_buf1[222 * 40]; 
+static lv_color_t lv_buf1[222 * 40];
+
+// Буфер для UART тексту
+static char uart_buffer[512];
+static int uart_buffer_pos = 0; 
 
 static void tft_flush(lv_disp_drv_t *disp, const lv_area_t *area,
                           lv_color_t *color_p)
@@ -37,6 +44,15 @@ static void btn_event_cb(lv_event_t *e) {
       lv_obj_set_style_bg_color(btn, lv_color_hex(0x87CEEB), 0);
     }
   }
+
+// Функція для оновлення тексту в textarea
+void update_uart_display() {
+    if (ui_textarea1 != NULL && uart_buffer_pos > 0) {
+        uart_buffer[uart_buffer_pos] = '\0';
+        lv_textarea_set_text(ui_textarea1, uart_buffer);
+        uart_buffer_pos = 0;
+    }
+}
 
 void touchHomeKeyCallback(void *user_data)
 {
@@ -110,6 +126,10 @@ if (!hasTouch) {
 
   ui_init();
 
+  // Ініціалізація UART буфера
+  uart_buffer[0] = '\0';
+  uart_buffer_pos = 0;
+
 }
 
 void loop() {
@@ -122,8 +142,26 @@ void loop() {
     lv_timer_handler();
 
     while (Uart.available() > 0) {
-        uint8_t byteFromSerial = Uart.read();
-        Serial.printf("Received: %d\n", byteFromSerial);
+        char c = Uart.read();
+        
+        // Додаємо символ до буфера (крім керуючих символів)
+        if (c >= 32 && c <= 126 && uart_buffer_pos < 511) {
+            uart_buffer[uart_buffer_pos++] = c;
+        } else if (c == '\n' && uart_buffer_pos < 511) {
+            uart_buffer[uart_buffer_pos++] = '\n';
+        }
+        
+        // Якщо буфер майже заповнений, оновлюємо дисплей
+        if (uart_buffer_pos >= 500) {
+            update_uart_display();
+        }
+    }
+
+    // Оновлюємо дисплей кожні 100мс
+    static uint32_t last_update = 0;
+    if (millis() - last_update > 10) {
+        update_uart_display();
+        last_update = millis();
     }
 
     delay(1);
