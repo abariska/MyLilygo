@@ -7,6 +7,11 @@
 #include "TouchDrvCSTXXX.hpp"
 #include <HardwareSerial.h>
 
+#define UART_BUF_SIZE 1024
+#define DISPLAY_BUF_SIZE 1024  // розмір буфера під весь лог
+#define MAX_LINE_LENGTH 100    // максимум символів у рядку
+#define LINE_HISTORY 80  
+
 // Оголошення UI об'єктів
 extern lv_obj_t *ui_textarea1;
 
@@ -16,9 +21,16 @@ HardwareSerial Uart(1);
 static lv_disp_draw_buf_t lv_draw_buf;
 static lv_color_t lv_buf1[222 * 40];
 
-// Буфер для UART тексту
-static char uart_buffer[512];
-static int uart_buffer_pos = 0; 
+
+
+char uart_buffer[UART_BUF_SIZE];
+char display_buffer[UART_BUF_SIZE];
+static uint16_t display_buffer_len = 0;
+volatile uint16_t write_pos = 0;
+volatile uint16_t read_pos = 0;
+
+void uart_receive_process();
+void update_ui_text(); 
 
 static void tft_flush(lv_disp_drv_t *disp, const lv_area_t *area,
                           lv_color_t *color_p)
@@ -44,15 +56,6 @@ static void btn_event_cb(lv_event_t *e) {
       lv_obj_set_style_bg_color(btn, lv_color_hex(0x87CEEB), 0);
     }
   }
-
-// Функція для оновлення тексту в textarea
-void update_uart_display() {
-    if (ui_textarea1 != NULL && uart_buffer_pos > 0) {
-        uart_buffer[uart_buffer_pos] = '\0';
-        lv_textarea_set_text(ui_textarea1, uart_buffer);
-        uart_buffer_pos = 0;
-    }
-}
 
 void touchHomeKeyCallback(void *user_data)
 {
@@ -128,7 +131,6 @@ if (!hasTouch) {
 
   // Ініціалізація UART буфера
   uart_buffer[0] = '\0';
-  uart_buffer_pos = 0;
 
 }
 
@@ -140,32 +142,102 @@ void loop() {
     last = now;
 
     lv_timer_handler();
-
-    while (Uart.available() > 0) {
-        char c = Uart.read();
-        
-        // Додаємо символ до буфера (крім керуючих символів)
-        if (c >= 32 && c <= 126 && uart_buffer_pos < 511) {
-            uart_buffer[uart_buffer_pos++] = c;
-        } else if (c == '\n' && uart_buffer_pos < 511) {
-            uart_buffer[uart_buffer_pos++] = '\n';
-        }
-        
-        // Якщо буфер майже заповнений, оновлюємо дисплей
-        if (uart_buffer_pos >= 500) {
-            update_uart_display();
-        }
-    }
-
-    // Оновлюємо дисплей кожні 100мс
+    
+    
     static uint32_t last_update = 0;
     if (millis() - last_update > 10) {
-        update_uart_display();
+        uart_receive_process();
+        update_ui_text();
         last_update = millis();
     }
 
+    
+    // update_ui_text();
     delay(1);
 }
+
+void add_line_to_display(const char *line) {
+    size_t line_len = strlen(line);
+    if (line_len > MAX_LINE_LENGTH) line_len = MAX_LINE_LENGTH; // обмеження довжини рядка
+
+    // Перевірка чи вміститься новий рядок + '\n' + '\0'
+    while (display_buffer_len + line_len + 2 >= DISPLAY_BUF_SIZE) {
+        // Видаляємо найстарший рядок
+        char *first_newline = strchr(display_buffer, '\n');
+        if (first_newline) {
+            size_t shift_len = first_newline - display_buffer + 1;
+            memmove(display_buffer, display_buffer + shift_len, display_buffer_len - shift_len);
+            display_buffer_len -= shift_len;
+        } else {
+            display_buffer_len = 0;
+            display_buffer[0] = '\0';
+            break;
+        }
+    }
+
+    // Додаємо новий рядок в кінець
+    memcpy(display_buffer + display_buffer_len, line, line_len);
+    display_buffer_len += line_len;
+    display_buffer[display_buffer_len++] = '\n';
+    display_buffer[display_buffer_len] = '\0';
+}
+
+void uart_receive_process() {
+    while (Uart.available() > 0) {
+        char c = Uart.read();
+        
+        uint16_t next_write_pos = (write_pos + 1) % UART_BUF_SIZE;
+        
+        // Перевірка переповнення
+        if (next_write_pos != read_pos) {
+            // Приймаємо тільки валідні символи
+            if ((c >= 32 && c <= 126) || c == '\n' || c == '\t' || c == '\r' || c == '\0') {
+                uart_buffer[write_pos] = c;
+                write_pos = next_write_pos;
+                
+                // Debug інформація (можна видалити)
+                Serial.print("Write pos: ");
+                Serial.println(write_pos);
+                Serial.print("Char: ");
+                Serial.println(c);
+            }
+        } else {
+            Serial.println("UART buffer overflow");
+        }
+    }
+}
+
+void update_ui_text() {
+    static char string_to_send[100];
+    static uint8_t string_index = 0;
+    static uint32_t last_ui_update = 0;
+
+    while (read_pos != write_pos) {
+        char c = uart_buffer[read_pos];
+        read_pos = (read_pos + 1) % UART_BUF_SIZE;
+
+        if (c >= 32 && c <= 126) {  // звичайні символи
+            if (string_index < sizeof(string_to_send) - 1) {
+                string_to_send[string_index++] = c;
+            }
+        } 
+        else if (c == '\n' || c == '\r') {  // кінець рядка
+            if (string_index > 0) {
+                string_to_send[string_index] = '\0';
+                add_line_to_display(string_to_send);
+                Serial.println(string_to_send);
+                string_index = 0;
+            }
+        }
+    }
+
+    if (millis() - last_ui_update > 10) {
+        lv_textarea_set_text(ui_textarea1, display_buffer);
+        lv_textarea_set_cursor_pos(ui_textarea1, LV_TEXTAREA_CURSOR_LAST); // автопрокрутка вниз
+        last_ui_update = millis();
+    }
+}
+
 
 // void SwitchApp(App new_app) {
 //     if (current_app != new_app) {

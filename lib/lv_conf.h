@@ -11,6 +11,7 @@ extern "C" {
 #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN   /* Use WARN by default; change to USER or DEBUG during dev */
 #define LV_LOG_PRINTF 1
 #define LV_LOG_TRACE_MEM 1
+#define LV_TEXTAREA_DEF_MAX_LEN 1024
 
 
 /* Horizontal and vertical resolution */
