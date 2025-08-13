@@ -9,7 +9,9 @@
 #pragma once
 // T-Display-Pro pinmap
 
+
 #define USING_DISPLAY_PRO_V1
+
 #define DEFAULT_CPU_FREQ_240MHZ
 #define HAS_PSRAM
 
