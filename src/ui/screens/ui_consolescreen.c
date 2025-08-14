@@ -4,10 +4,15 @@
 // Project name: SquareLine_Project
 
 #include "../ui.h"
+#include "../../console.h"
 
-lv_obj_t *ui_consolescreen = NULL;lv_obj_t *ui_Container1 = NULL;
+lv_obj_t *ui_consolescreen = NULL;
+lv_obj_t *ui_Container1 = NULL;
+
 lv_obj_t * log_list;
-lv_obj_t * log_items[30];
+lv_timer_t * console_timer = NULL; 
+
+static bool console_running = false;
 // event funtions
 
 // build funtions
@@ -16,8 +21,15 @@ void ui_consolescreen_screen_init(void)
 {
 ui_consolescreen = lv_obj_create(NULL);
 lv_obj_clear_flag( ui_consolescreen, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
-lv_obj_set_style_bg_color(ui_consolescreen, lv_color_hex(0x001F1C), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_color(ui_consolescreen, lv_color_hex(0x001405), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_consolescreen, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+ui_Container1 = lv_obj_create(ui_consolescreen);
+lv_obj_remove_style_all(ui_Container1);
+lv_obj_set_width( ui_Container1, 222);
+lv_obj_set_height( ui_Container1, 480);
+lv_obj_set_align( ui_Container1, LV_ALIGN_CENTER );
+lv_obj_clear_flag( ui_Container1, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 
 log_list = lv_list_create(ui_consolescreen);
 lv_obj_set_size( log_list, lv_pct(100), lv_pct(100));
@@ -30,19 +42,25 @@ lv_obj_set_style_text_opa(log_list, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_bg_color(log_list, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(log_list, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 
-
 lv_obj_set_style_pad_all(log_list, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+console_timer = lv_timer_create(Console_run, 10, NULL);
+
+
 }
+
 
 void ui_consolescreen_screen_destroy(void)
 {
    if (ui_consolescreen) lv_obj_del(ui_consolescreen);
-
+//    if (console_timer) {
+//       lv_timer_del(console_timer);
+//       console_timer = NULL;
+//   }
 // NULL screen variables
 ui_consolescreen= NULL;
-log_list= NULL;
-for (uint8_t i = 0; i < 30; i++) {
-    log_items[i] = NULL;
-}
+ui_Container1= NULL;
+
+
 
 }

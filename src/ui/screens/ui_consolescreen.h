@@ -13,8 +13,11 @@ extern "C" {
 // SCREEN: ui_consolescreen
 extern void ui_consolescreen_screen_init(void);
 extern void ui_consolescreen_screen_destroy(void);
+extern void Console_stop(void);
 extern lv_obj_t *ui_consolescreen;
 extern lv_obj_t *ui_Container1;
+
+extern lv_timer_t * console_timer;
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

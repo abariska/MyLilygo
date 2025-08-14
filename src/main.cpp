@@ -59,9 +59,9 @@ void loop() {
 
     lv_timer_handler();
     
-    if (ui_consolescreen) {
-        Console_run();
-    }
+    // if (ui_consolescreen) {
+    //     Console_run();
+    // }
     
     delay(1);
 }

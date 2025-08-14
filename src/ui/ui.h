@@ -6,10 +6,6 @@
 #ifndef _SQUARELINE_PROJECT_UI_H
 #define _SQUARELINE_PROJECT_UI_H
 
-#include "../../include/header.h"
-
-#include <Arduino.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,20 +25,25 @@ extern "C" {
 #include "ui_helpers.h"
 #include "ui_events.h"
 
-
 ///////////////////// SCREENS ////////////////////
 #include "screens/ui_mainscreen.h"
 #include "screens/ui_consolescreen.h"
+#include "screens/ui_keyboardscreen.h"
+#include "screens/ui_midicontrolscreen.h"
 
 ///////////////////// VARIABLES ////////////////////
 
 // EVENTS
 extern lv_obj_t *ui____initial_actions0;
 
+// IMAGES AND IMAGE SETS
+LV_IMG_DECLARE( ui_img_console_5653_png);   // assets/console_5653.png
+LV_IMG_DECLARE( ui_img_1401235292);   // assets/Piano_icon-icons.com_53685.png
+LV_IMG_DECLARE( ui_img_knob_png);   // assets/knob.png
+
 // UI INIT
 void ui_init(void);
 void ui_destroy(void);
-
 void return_home_cd(void *user_data);
 
 #ifdef __cplusplus

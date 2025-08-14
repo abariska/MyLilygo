@@ -8,6 +8,7 @@ extern "C" {
 
 /* Enable LGVG logging */
 #define LV_USE_LOG 1
+#define LV_USE_LOG_ADD_LINE 1
 #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN   /* Use WARN by default; change to USER or DEBUG during dev */
 #define LV_LOG_PRINTF 1
 #define LV_LOG_TRACE_MEM 1

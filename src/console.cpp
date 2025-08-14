@@ -1,7 +1,12 @@
 #include "console.h"
+#include <Arduino.h>
+#include <HardwareSerial.h>
 
 extern HardwareSerial Uart;
+
 uint16_t log_count = 0;
+lv_obj_t * log_items[LINE_HISTORY];
+
 
 void log_add_line(const char * text) {
     // Якщо кількість елементів досягла максимуму — видаляємо перший (найстаріший)
@@ -48,6 +53,7 @@ void Console_run() {
     if (millis() - last_update > 10) {
         uart_receive_process();
         last_update = millis();
+        // Serial.println("Console_run");
     }
 }
 

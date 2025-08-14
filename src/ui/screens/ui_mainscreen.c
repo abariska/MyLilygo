@@ -5,39 +5,81 @@
 
 #include "../ui.h"
 
-lv_obj_t *ui_mainscreen = NULL;lv_obj_t *ui_Button1 = NULL;lv_obj_t *ui_Button2 = NULL;
+lv_obj_t *ui_mainscreen = NULL;lv_obj_t *ui_Button1 = NULL;lv_obj_t *ui_Button2 = NULL;lv_obj_t *ui_Button3 = NULL;lv_obj_t *ui_Button4 = NULL;
 // event funtions
 void ui_event_Button1( lv_event_t * e) {
     lv_event_code_t event_code = lv_event_get_code(e);
 
 if ( event_code == LV_EVENT_CLICKED) {
-      _ui_screen_change( &ui_consolescreen, LV_SCR_LOAD_ANIM_FADE_ON, 100, 0, &ui_consolescreen_screen_init);
+      _ui_screen_change( &ui_consolescreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_consolescreen_screen_init);
 }
 }
 
+void ui_event_Button2( lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+if ( event_code == LV_EVENT_CLICKED) {
+      _ui_screen_change( &ui_keyboardscreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_keyboardscreen_screen_init);
+}
+}
+
+void ui_event_Button3( lv_event_t * e) {
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+if ( event_code == LV_EVENT_CLICKED) {
+      _ui_screen_change( &ui_midicontrolscreen, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_midicontrolscreen_screen_init);
+}
+}
 // build funtions
 
 void ui_mainscreen_screen_init(void)
 {
 ui_mainscreen = lv_obj_create(NULL);
-lv_obj_set_style_bg_color(ui_mainscreen, lv_color_hex(0x16302B), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_color(ui_mainscreen, lv_color_hex(0x737373), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_mainscreen, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_grad_color(ui_mainscreen, lv_color_hex(0x4B4A4A), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_grad_dir(ui_mainscreen, LV_GRAD_DIR_VER, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_Button1 = lv_btn_create(ui_mainscreen);
 lv_obj_set_width( ui_Button1, 120);
 lv_obj_set_height( ui_Button1, 120);
 lv_obj_set_x( ui_Button1, 0 );
-lv_obj_set_y( ui_Button1, -156 );
+lv_obj_set_y( ui_Button1, -160 );
 lv_obj_set_align( ui_Button1, LV_ALIGN_CENTER );
-lv_obj_set_style_bg_color(ui_Button1, lv_color_hex(0xFFF26B), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_color(ui_Button1, lv_color_hex(0xB8FFCB), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_Button1, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_img_src( ui_Button1, &ui_img_console_5653_png, LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_text_color(ui_Button1, lv_color_hex(0x808080), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_text_opa(ui_Button1, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_transform_pivot_x(ui_Button1, 2, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_transform_pivot_y(ui_Button1, 0, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_Button2 = lv_btn_create(ui_mainscreen);
 lv_obj_set_width( ui_Button2, 120);
 lv_obj_set_height( ui_Button2, 120);
-lv_obj_set_x( ui_Button2, 0 );
-lv_obj_set_y( ui_Button2, 3 );
 lv_obj_set_align( ui_Button2, LV_ALIGN_CENTER );
+lv_obj_set_style_bg_color(ui_Button2, lv_color_hex(0xAFD9FC), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_opa(ui_Button2, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_img_src( ui_Button2, &ui_img_1401235292, LV_PART_MAIN | LV_STATE_DEFAULT );
+
+ui_Button3 = lv_btn_create(ui_mainscreen);
+lv_obj_set_width( ui_Button3, 120);
+lv_obj_set_height( ui_Button3, 120);
+lv_obj_set_x( ui_Button3, 0 );
+lv_obj_set_y( ui_Button3, 160 );
+lv_obj_set_align( ui_Button3, LV_ALIGN_CENTER );
+lv_obj_set_style_bg_color(ui_Button3, lv_color_hex(0xFDD59D), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_opa(ui_Button3, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_img_src( ui_Button3, &ui_img_knob_png, LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_img_recolor(ui_Button3, lv_color_hex(0x000000), LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_img_recolor_opa(ui_Button3, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+ui_Button4 = lv_btn_create(ui_mainscreen);
+lv_obj_set_width( ui_Button4, 120);
+lv_obj_set_height( ui_Button4, 120);
+lv_obj_set_x( ui_Button4, 0 );
+lv_obj_set_y( ui_Button4, 320 );
+lv_obj_set_align( ui_Button4, LV_ALIGN_CENTER );
 
 lv_obj_add_event_cb(ui_Button1, ui_event_Button1, LV_EVENT_ALL, NULL);
 
@@ -51,5 +93,7 @@ void ui_mainscreen_screen_destroy(void)
 ui_mainscreen= NULL;
 ui_Button1= NULL;
 ui_Button2= NULL;
+ui_Button3= NULL;
+ui_Button4= NULL;
 
 }

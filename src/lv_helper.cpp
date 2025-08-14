@@ -23,7 +23,7 @@ void tft_flush(lv_disp_drv_t *disp, const lv_area_t *area,
 
 void lv_touch_homekey_set_cb(home_button_callback_t  cb)
 {
-    homeCb = cb;
+    homeCb = cb; 
 }
 
 void touchHomeKeyCallback(void *user_data)

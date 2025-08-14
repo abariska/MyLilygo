@@ -34,6 +34,8 @@ lv_theme_t *theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE
 lv_disp_set_theme(dispp, theme);
 ui_mainscreen_screen_init();
 // ui_consolescreen_screen_init();
+// ui_keyboardscreen_screen_init();
+// ui_midicontrolscreen_screen_init();
 ui____initial_actions0 = lv_obj_create(NULL);
 lv_disp_load_scr( ui_mainscreen);
 }
@@ -41,9 +43,14 @@ lv_disp_load_scr( ui_mainscreen);
 void ui_destroy( void )
 {ui_mainscreen_screen_destroy();
 ui_consolescreen_screen_destroy();
+ui_keyboardscreen_screen_destroy();
+ui_midicontrolscreen_screen_destroy();
 }
 
-void return_home_cd(void *user_data) 
+void return_home_cd(void *user_data )
 {
-    _ui_screen_change(ui_mainscreen, LV_SCR_LOAD_ANIM_NONE, 200, 0, &ui_mainscreen_screen_init);
+
+    _ui_screen_change(&ui_mainscreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_mainscreen_screen_init);
+    
+    
 }
